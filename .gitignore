@@ -1,9 +1,9 @@
-# 依赖目录（体积大，绝不能上传）
-node_modules/
+# 依赖目录（按需求上传，已取消忽略）
+# node_modules/
 
-# 构建产物（审核时会自己 build，不需要传）
-dist/
-dist-ssr/
+# 构建产物（按需求上传，已取消忽略）
+# dist/
+# dist-ssr/
 
 # 日志
 *.log

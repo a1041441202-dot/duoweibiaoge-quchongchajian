@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>删除重复记录</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft Yahei", sans-serif;
+      padding: 0;
+      font-size: 14px;
+      color: #333;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+    .header {
+      background: #fff;
+      padding: 16px;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-left h1 { font-size: 16px; font-weight: 600; }
+    .header-left p { font-size: 12px; color: #999; margin-top: 2px; }
+    .header-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 30px; height: 30px;
+      border: none; background: #f5f5f5;
+      border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #666;
+    }
+    .icon-btn:hover { background: #e8e8e8; }
+
+    .section { padding: 16px; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: 500; }
+    select, .field-row select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+      color: #333;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: #1890ff; }
+
+    .table-info {
+      font-size: 11px; color: #999; margin-top: 4px;
+      padding: 6px 10px;
+      background: #fafafa;
+      border-radius: 4px;
+      line-height: 1.6;
+    }
+    .table-info span { color: #1890ff; font-weight: 500; }
+
+    /* ========== 条件组 ========== */
+    .condition-groups-hint {
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 8px;
+    }
+
+    .condition-group {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 0;
+    }
+
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .group-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+    }
+    .group-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remove-group-btn {
+      width: 22px; height: 22px; flex-shrink: 0;
+      border: none; background: transparent;
+      color: #ff4d4f; font-size: 18px;
+      cursor: pointer; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .remove-group-btn:hover { background: #fff1f0; }
+    .remove-group-btn:disabled { color: #d9d9d9; cursor: not-allowed; }
+
+    .logic-toggle {
+      display: flex;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .logic-toggle button {
+      padding: 4px 10px;
+      border: none;
+      background: #fff;
+      color: #666;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .logic-toggle button.active { background: #1890ff; color: #fff; }
+    .logic-toggle button:not(:last-child) { border-right: 1px solid #d9d9d9; }
+    .logic-toggle button.active:not(:last-child) { border-right-color: #1890ff; }
+
+    .group-connector {
+      text-align: center;
+      font-size: 11px;
+      color: #bbb;
+      padding: 4px 0;
+    }
+
+    .field-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .field-row select { flex: 1; margin-bottom: 0; }
+
+    .field-row .remove-field {
+      width: 26px; height: 26px; flex-shrink: 0;
+      border: 1px solid #ff4d4f; background: #fff;
+      color: #ff4d4f; border-radius: 6px;
+      cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .field-row .remove-field:hover { background: #fff1f0; }
+    .field-row .remove-field:disabled { border-color: #d9d9d9; color: #d9d9d9; cursor: not-allowed; }
+
+    .add-field-btn {
+      border: 1px dashed #1890ff;
+      background: #fff;
+      color: #1890ff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      width: 100%;
+      transition: all .2s;
+      margin-top: 6px;
+    }
+    .add-field-btn:hover { background: #e6f7ff; }
+
+    .add-group-btn {
+      border: 1px dashed #1890ff;
+      background: #fff;
+      color: #1890ff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+      transition: all .2s;
+      margin-top: 8px;
+    }
+    .add-group-btn:hover { background: #e6f7ff; }
+
+    /* ========== 间隔 & 按钮 ========== */
+    .interval-group {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    }
+    .interval-group .form-label { margin-bottom: 0; white-space: nowrap; }
+    .interval-group select { width: auto; min-width: 130px; }
+
+    .btn-row {
+      display: flex; gap: 8px;
+    }
+    .btn-row button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-primary { background: #1890ff; color: #fff; }
+    .btn-primary:hover { background: #096dd9; }
+    .btn-primary:disabled { background: #a0c4ff; cursor: not-allowed; }
+    .btn-outline {
+      background: #fff; color: #1890ff;
+      border: 1px solid #1890ff;
+    }
+    .btn-outline:hover { background: #e6f7ff; }
+    .btn-outline:disabled { color: #a0c4ff; border-color: #d9d9d9; cursor: not-allowed; }
+
+    /* ========== 任务列表 ========== */
+    .task-section { padding: 0 16px 16px; }
+    .task-section-title {
+      font-size: 13px; font-weight: 600; color: #999;
+      margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .task-count { font-weight: 400; color: #bbb; }
+
+    .task-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #eee;
+      position: relative;
+    }
+    .task-card.running { border-left: 3px solid #1890ff; }
+    .task-card.stopped { border-left: 3px solid #d9d9d9; }
+
+    .task-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .task-title { font-size: 13px; font-weight: 600; color: #333; }
+    .task-badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 10px;
+      background: #e6f7ff; color: #1890ff;
+    }
+    .task-badge.idle { background: #f5f5f5; color: #999; }
+
+    .task-detail { font-size: 12px; color: #666; line-height: 1.8; }
+    .task-detail b { color: #333; font-weight: 500; }
+    .task-detail .logic-tag {
+      display: inline-block; padding: 1px 6px; border-radius: 3px;
+      font-size: 11px; font-weight: 600;
+      background: #fff7e6; color: #fa8c16;
+    }
+    .task-detail .logic-tag.or { background: #e6f7ff; color: #1890ff; }
+
+    .task-meta { font-size: 11px; color: #999; margin-top: 4px; }
+
+    .task-actions {
+      margin-top: 8px; display: flex; gap: 6px;
+      padding-top: 8px; border-top: 1px solid #f0f0f0;
+    }
+    .task-actions button {
+      padding: 4px 12px; border-radius: 4px; font-size: 12px;
+      cursor: pointer; border: 1px solid #d9d9d9;
+      background: #fff; color: #666; transition: all .2s;
+    }
+    .task-actions button:hover { color: #1890ff; border-color: #1890ff; }
+    .task-actions .btn-stop { color: #fa8c16; border-color: #fa8c16; }
+    .task-actions .btn-stop:hover { background: #fff7e6; }
+    .task-actions .btn-remove { color: #ff4d4f; border-color: #ff4d4f; }
+    .task-actions .btn-remove:hover { background: #fff1f0; }
+
+    .task-log {
+      margin-top: 8px;
+      padding: 8px;
+      background: #fafafa;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #888;
+      max-height: 80px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .empty {
+      text-align: center; color: #ccc; padding: 30px 0; font-size: 13px;
+    }
+
+    .divider {
+      height: 1px; background: #e8e8e8; margin: 4px 16px;
+    }
+
+    .one-shot-result {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #e6f7ff;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #1890ff;
+      display: none;
+    }
+    .one-shot-result.error { background: #fff1f0; color: #ff4d4f; }
+  </style>
+  <script type="module" crossorigin src="./assets/index-Tc2Ne4Gh.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <h1>删除重复记录</h1>
+      <p>查找并批量删除重复的记录</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="refreshBtn" title="刷新">&#x21bb;</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="form-group">
+      <div class="form-label">当前数据表</div>
+      <select id="tableSelect"><option>加载中...</option></select>
+      <div class="table-info" id="tableInfo">加载中...</div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">去重条件</div>
+      <div class="condition-groups-hint">多个条件组之间为"且(AND)"关系，默认保留第一条重复记录</div>
+      <div id="groupList"></div>
+      <button class="add-group-btn" id="addGroupBtn">+ 添加条件组</button>
+    </div>
+
+    <div class="interval-group">
+      <div class="form-label">执行间隔</div>
+      <select id="intervalSelect">
+        <option value="5">每 5 分钟</option>
+        <option value="10">每 10 分钟</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-outline" id="onceBtn">立即执行一次</button>
+      <button class="btn-primary" id="addTaskBtn">启动定时任务</button>
+    </div>
+    <div class="one-shot-result" id="onceResult"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="task-section">
+    <div class="task-section-title">
+      定时任务
+      <span class="task-count" id="taskCount"></span>
+    </div>
+    <div id="taskList">
+      <div class="empty">暂无运行中的任务</div>
+    </div>
+  </div>
+
+</body>
+</html>
