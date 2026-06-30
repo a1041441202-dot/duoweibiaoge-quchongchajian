@@ -1,0 +1,31 @@
+# 依赖目录（体积大，绝不能上传）
+node_modules/
+
+# 构建产物（审核时会自己 build，不需要传）
+dist/
+dist-ssr/
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# 环境变量 / 密钥（防止泄露）
+.env
+.env.local
+.env.*.local
+
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 缓存
+.cache/
+.eslintcache
+*.tsbuildinfo

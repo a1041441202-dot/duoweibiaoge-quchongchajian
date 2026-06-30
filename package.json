@@ -1,0 +1,20 @@
+{
+  "name": "bitable-dedup",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "飞书多维表格边栏去重插件 - 按指定字段去重，定时触发",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@lark-base-open/js-sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  },
+  "output": "dist"
+}
